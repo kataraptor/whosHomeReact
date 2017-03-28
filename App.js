@@ -1,23 +1,61 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, NativeModules } from 'react-native';
+import IsHome from './app/IsHome';
 
 export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      statusBarHeight: 20
+    }
+    try {
+      NativeModules.StatusBarManager.getHeight(
+        (statusBarFrameData) => {
+          this.setState({statusBarHeight: statusBarFrameData.height});
+        }
+      );
+    } catch (e) {
+        console.log("There was an errkr getting the status bar");
+    }
+  }
+
+  data = {
+    usersHome: [
+      {
+        name: "Denny",
+        key: 1
+      },
+      {
+        name: "Travis",
+        key: 2
+      }
+    ],
+    notHome: [
+      {
+        name: "Katrina",
+        key: 1
+      }
+    ]
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-        <Text>Changes you make will automatically reload.</Text>
-        <Text>Shake your phone to open the developer menu.</Text>
+      <View style={[styles.container, {
+            marginTop: this.state.statusBarHeight
+          }]}>
+      <IsHome title="Who's Home" usersHome={ this.data.usersHome } />
+      <IsHome title="Who's not Home" style={{marginTop: 20}} usersHome={ this.data.notHome } />
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
+let styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 100
   },
 });
+
+let StatusBarSizeIOS = {};
